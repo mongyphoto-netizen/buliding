@@ -272,7 +272,34 @@
                 }
             });
 
-            // Show results
+            // เตรียมข้อมูลส่งไปยัง Google Sheet
+            const scriptURL = 'ใส่_URL_ของ_WEB_APP_ที่นี่'; // << เอา URL จาก Google Apps Script มาใส่ตรงนี้
+            
+            const formData = new FormData();
+            formData.append('name', nickname);
+            formData.append('score', score);
+
+            // แสดงหน้าโหลดระหว่างส่งข้อมูล
+            submitBtn.textContent = 'กำลังบันทึกข้อมูล...';
+            submitBtn.disabled = true;
+
+            if (scriptURL !== 'ใส่_URL_ของ_WEB_APP_ที่นี่') {
+                fetch(scriptURL, { method: 'POST', body: formData, mode: 'no-cors' })
+                    .then(response => {
+                        showResults(score, nickname);
+                    })
+                    .catch(error => {
+                        console.error('Error!', error.message);
+                        alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล แต่ระบบจะแสดงผลคะแนนให้ทราบ');
+                        showResults(score, nickname);
+                    });
+            } else {
+                // ถ้ายังไม่ใส่ URL ให้แสดงผลปกติ
+                showResults(score, nickname);
+            }
+        }
+
+        function showResults(score, nickname) {
             document.getElementById('display-name').textContent = nickname;
             scoreElement.textContent = score;
             if(score === 20) {
@@ -288,6 +315,10 @@
                 scoreMessageElement.textContent = "ต้องพยายามอีกนิด! ลองทบทวนความรู้และลองทำแบบทดสอบใหม่อีกครั้งนะครับ";
                 scoreMessageElement.className = "text-xl mb-8 text-red-600 font-semibold";
             }
+            
+            submitBtn.classList.add('hidden');
+            submitBtn.textContent = 'ส่งคำตอบและดูผลคะแนน';
+            submitBtn.disabled = false;
             
             resultContainer.classList.remove('hidden');
             resultContainer.scrollIntoView({ behavior: 'smooth' });
