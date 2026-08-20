@@ -279,6 +279,14 @@
             formData.append('name', nickname);
             formData.append('score', score);
 
+            // เก็บคำตอบรายข้อส่งไปด้วย (q0 ถึง q19)
+            quizData.forEach((item, qIndex) => {
+                const selected = document.querySelector(`input[name="q${qIndex}"]:checked`);
+                // ดึงเฉพาะตัวอักษร ก. ข. ค. ง. จ. จากตัวเลือก
+                const answerText = item.options[selected.value].split(' ')[0]; 
+                formData.append('q' + (qIndex + 1), answerText);
+            });
+
             // แสดงหน้าโหลดระหว่างส่งข้อมูล
             submitBtn.textContent = 'กำลังบันทึกข้อมูล...';
             submitBtn.disabled = true;
