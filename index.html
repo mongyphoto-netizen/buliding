@@ -273,7 +273,7 @@
             });
 
             // เตรียมข้อมูลส่งไปยัง Google Sheet
-            const scriptURL = 'ใส่_URL_ของ_WEB_APP_ที่นี่'; // << เอา URL จาก Google Apps Script มาใส่ตรงนี้
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbwcQXigc8i_c98TTSVfOCtCvAxk5888IGJkhDtq0VUD06f62ROVGjuCTU1jEZ61ZyCQ3g/exec';
             
             const formData = new FormData();
             formData.append('name', nickname);
@@ -283,7 +283,7 @@
             submitBtn.textContent = 'กำลังบันทึกข้อมูล...';
             submitBtn.disabled = true;
 
-            if (scriptURL !== 'ใส่_URL_ของ_WEB_APP_ที่นี่') {
+            if (scriptURL) {
                 fetch(scriptURL, { method: 'POST', body: formData, mode: 'no-cors' })
                     .then(response => {
                         showResults(score, nickname);
