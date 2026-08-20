@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบทดสอบความรู้: อาคารสั่นไหว คำนวณได้</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .option-label {
+            transition: all 0.2s ease-in-out;
+        }
+        .option-label:hover {
+            background-color: #e5e7eb;
+        }
+        input[type="radio"]:checked + span {
+            font-weight: 600;
+            color: #2563eb;
+        }
+        .correct-answer {
+            background-color: #d1fae5 !important;
+            border-color: #059669 !important;
+            color: #065f46;
+        }
+        .wrong-answer {
+            background-color: #fee2e2 !important;
+            border-color: #dc2626 !important;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen pb-12">
+
+    <!-- Header Section -->
+    <header class="bg-blue-600 text-white shadow-lg py-12 px-4 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">แบบทดสอบความรู้</h1>
+        <h2 class="text-2xl md:text-3xl font-medium mb-6">“อาคารสั่นไหว คำนวณได้”</h2>
+        <p class="text-lg md:text-xl opacity-90 max-w-2xl mx-auto">
+            ทดสอบความรู้ความเข้าใจเกี่ยวกับการเกิดแผ่นดินไหว พฤติกรรมของอาคาร และหลักการออกแบบโครงสร้างต้านทานแผ่นดินไหว
+        </p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 mt-8">
+        <div id="quiz-container" class="bg-white rounded-xl shadow-md p-6 md:p-10">
+            <!-- Name Input -->
+            <div class="mb-8 p-6 bg-blue-50 rounded-lg border border-blue-100">
+                <label for="nickname" class="block text-lg font-semibold text-gray-800 mb-2">ชื่อเล่น หรือ นามสมมติ</label>
+                <input type="text" id="nickname" class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="กรอกชื่อของคุณที่นี่...">
+            </div>
+
+            <div id="questions-list"></div>
+            
+            <div class="mt-8 flex justify-center border-t pt-8">
+                <button id="submit-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition duration-300 text-lg">
+                    ส่งคำตอบและดูผลคะแนน
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="result-container" class="hidden mt-8 bg-white rounded-xl shadow-md p-6 md:p-10 text-center">
+            <h3 class="text-3xl font-bold text-gray-800 mb-2">สรุปผลคะแนนของคุณ <span id="display-name" class="text-blue-600"></span></h3>
+            <div class="text-6xl font-extrabold text-blue-600 my-6">
+                <span id="score">0</span> / 20
+            </div>
+            <p id="score-message" class="text-xl mb-8"></p>
+            <button id="retry-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded-lg transition duration-300">
+                ทำแบบทดสอบอีกครั้ง
+            </button>
+        </div>
+    </main>
+
+    <script>
+        const quizData = [
+            {
+                q: "1. แผ่นดินไหวเกิดจากสาเหตุใด",
+                options: ["ก. การเปลี่ยนแปลงอุณหภูมิ", "ข. การเคลื่อนตัวของเปลือกโลก", "ค. การหมุนของโลก", "ง. การเกิดพายุ", "จ. การเคลื่อนตัวของน้ำใต้ดิน"],
+                ans: 1,
+                ref: "อ้างอิง: https://tmd.go.th/info/แผนดนไหว"
+            },
+            {
+                q: "2. แรงจากแผ่นดินไหวส่งผลต่ออาคารในลักษณะใด",
+                options: ["ก. แรงกดแนวดิ่ง", "ข. แรงดันน้ำ", "ค. แรงสั่นสะเทือนด้านข้าง", "ง. แรงดันลม", "จ. แรงดึงแนวดิ่ง"],
+                ans: 2,
+                ref: "อ้างอิง: Agarwal – Earthquake Resistant Design"
+            },
+            {
+                q: "3. เมื่อแรงแผ่นดินไหวเดินทางมาถึงอาคาร จะทำให้อาคารเกิดพฤติกรรมใด",
+                options: ["ก. หมุนรอบฐานราก", "ข. สั่น โยก หรือเอียง", "ค. ยืดตัว", "ง. ลดน้ำหนัก", "จ. เปลี่ยนรูปทรงถาวรทันที"],
+                ans: 1,
+                ref: "อ้างอิง: Chopra"
+            },
+            {
+                q: "4. หลักการสำคัญของการออกแบบอาคารต้านทานแผ่นดินไหวคืออะไร",
+                options: ["ก. ทำให้อาคารหนักที่สุด", "ข. ทำให้อาคารเบาที่สุด", "ค. ออกแบบให้โครงสร้างรับแรงสั่นสะเทือนได้", "ง. ลดจำนวนเสา", "จ. ลดจำนวนคาน"],
+                ans: 2,
+                ref: "อ้างอิง: มยผ.1301"
+            },
+            {
+                q: "5. อาคารที่ปลอดภัยจากแผ่นดินไหวควรมีคุณสมบัติใด",
+                options: ["ก. แข็งแรงอย่างเดียว", "ข. ยืดหยุ่นอย่างเดียว", "ค. แข็งแรงและยืดหยุ่น", "ง. น้ำหนักมาก", "จ. น้ำหนักเบา"],
+                ans: 2,
+                ref: "อ้างอิง: FEMA 356"
+            },
+            {
+                q: "6. ข้อใดคือองค์ประกอบโครงสร้างหลักของอาคาร",
+                options: ["ก. เสา คาน ฐานราก", "ข. ฝ้าเพดาน", "ค. ผนังตกแต่ง", "ง. กระจก", "จ. สีทาอาคาร"],
+                ans: 0,
+                ref: "อ้างอิง: FEMA 356"
+            },
+            {
+                q: "7. หน้าที่ของ Shear Wall ในอาคารคืออะไร",
+                options: ["ก. เพิ่มความสวยงาม", "ข. รับแรงด้านข้างจากแผ่นดินไหว", "ค. ลดน้ำหนักอาคาร", "ง. ป้องกันความร้อน", "จ. ป้องกันเสียง"],
+                ans: 1,
+                ref: "อ้างอิง: Agarwal"
+            },
+            {
+                q: "8. Cross Bracing ใช้เพื่อวัตถุประสงค์ใด",
+                options: ["ก. เพิ่มพื้นที่อาคาร", "ข. ถ่ายแรงด้านข้างสู่ฐานราก", "ค. เพิ่มความสูงอาคาร", "ง. ลดแรงลม", "จ. ลดแรงโน้มถ่วง"],
+                ans: 1,
+                ref: "อ้างอิง: FEMA 356"
+            },
+            {
+                q: "9. คำว่า Ductility ในวิศวกรรมโครงสร้างหมายถึงอะไร",
+                options: ["ก. ความแข็ง", "ข. ความเหนียวของโครงสร้าง", "ค. ความหนาของโครงสร้าง", "ง. ความหนักของโครงสร้าง", "จ. ความยาวของโครงสร้าง"],
+                ans: 1,
+                ref: "อ้างอิง: Chopra"
+            },
+            {
+                q: "10. โครงสร้างที่มี Ductility สูงจะมีคุณสมบัติอย่างไร",
+                options: ["ก. แตกหักทันที", "ข. รับแรงสั่นสะเทือนได้โดยไม่พังทันที", "ค. ยุบตัวทันที", "ง. ไม่สั่น", "จ. ไม่รับแรง"],
+                ans: 1,
+                ref: "อ้างอิง: Chopra"
+            },
+            {
+                q: "11. มาตรฐานการออกแบบอาคารต้านทานแผ่นดินไหวของประเทศไทยคือข้อใด",
+                options: ["ก. ISO 9001", "ข. ASTM", "ค. มยผ.1301", "ง. ACI 318", "จ. BS Code"],
+                ans: 2,
+                ref: "อ้างอิง: มยผ.1301-61"
+            },
+            {
+                q: "12. Seismic Hazard Map ใช้สำหรับอะไร",
+                options: ["ก. แสดงความสูงอาคาร", "ข. แสดงพื้นที่เสี่ยงแผ่นดินไหว", "ค. แสดงพื้นที่น้ำท่วม", "ง. แสดงโครงสร้างอาคาร", "จ. แสดงความเร็วลม"],
+                ans: 1,
+                ref: "อ้างอิง: มยผ.1301"
+            },
+            {
+                q: "13. วิธีวิเคราะห์แรงแผ่นดินไหวแบบใดใช้กันทั่วไปในงานออกแบบ",
+                options: ["ก. Static analysis", "ข. Response Spectrum Analysis", "ค. Wind analysis", "ง. Thermal analysis", "จ. Soil analysis"],
+                ans: 1,
+                ref: "อ้างอิง: Chopra"
+            },
+            {
+                q: "14. Time History Analysis ใช้เพื่ออะไร",
+                options: ["ก. วิเคราะห์การสั่นของอาคารตามเวลา", "ข. วิเคราะห์แรงลม", "ค. วิเคราะห์น้ำหนักอาคาร", "ง. วิเคราะห์ความร้อน", "จ. วิเคราะห์ความชื้น"],
+                ans: 0,
+                ref: "อ้างอิง: Chopra"
+            },
+            {
+                q: "15. การคำนวณแรงแผ่นดินไหวจำเป็นต้องใช้ข้อมูลใด",
+                options: ["ก. สภาพดิน", "ข. มวลอาคาร", "ค. ระดับความเสี่ยงแผ่นดินไหว", "ง. ความสูงอาคาร", "จ. ถูกทุกข้อ"],
+                ans: 4,
+                ref: "อ้างอิง: มยผ.1301"
+            },
+            {
+                q: "16. ใครเป็นผู้รับผิดชอบในการคำนวณและออกแบบโครงสร้างต้านทานแผ่นดินไหว",
+                options: ["ก. สถาปนิก", "ข. วิศวกรโครงสร้าง", "ค. ผู้รับเหมา", "ง. เจ้าของอาคาร", "จ. นักบัญชี"],
+                ans: 1,
+                ref: "อ้างอิง: มยผ.1301"
+            },
+            {
+                q: "17. หน่วยงานใดกำหนดมาตรฐานการออกแบบอาคารต้านทานแผ่นดินไหวในประเทศไทย",
+                options: ["ก. กรมชลประทาน", "ข. กรมโยธาธิการและผังเมือง", "ค. กรมอุตุนิยมวิทยา", "ง. กรมทางหลวง", "จ. กรมที่ดิน"],
+                ans: 1,
+                ref: "อ้างอิง: มยผ.1301"
+            },
+            {
+                q: "18. เหตุใดการคำนวณแรงแผ่นดินไหวจึงมีความสำคัญ",
+                options: ["ก. เพื่อลดต้นทุนก่อสร้าง", "ข. เพื่อให้โครงสร้างรับแรงสั่นสะเทือนได้", "ค. เพื่อเพิ่มจำนวนชั้น", "ง. เพื่อเพิ่มพื้นที่อาคาร", "จ. เพื่อเพิ่มความสูง"],
+                ans: 1,
+                ref: "อ้างอิง: Agarwal"
+            },
+            {
+                q: "19. แนวคิด “อาคารสั่นไหว คำนวณได้” หมายถึงอะไร",
+                options: ["ก. อาคารไม่สั่น", "ข. อาคารไม่เสียหาย", "ค. พฤติกรรมการสั่นของอาคารสามารถคำนวณได้ทางวิศวกรรม", "ง. อาคารสูงขึ้น", "จ. อาคารไม่ต้องออกแบบ"],
+                ans: 2,
+                ref: "อ้างอิง: Chopra"
+            },
+            {
+                q: "20. ความมั่นใจของประชาชนต่อความปลอดภัยของอาคารเกิดจากอะไร",
+                options: ["ก. ความโชคดี", "ข. การก่อสร้างเร็ว", "ค. การออกแบบและคำนวณตามมาตรฐานวิศวกรรม", "ง. การตกแต่งอาคาร", "จ. การใช้วัสดุราคาแพง"],
+                ans: 2,
+                ref: "อ้างอิง: มยผ.1301"
+            }
+        ];
+
+        const questionsContainer = document.getElementById('questions-list');
+        const submitBtn = document.getElementById('submit-btn');
+        const resultContainer = document.getElementById('result-container');
+        const scoreElement = document.getElementById('score');
+        const scoreMessageElement = document.getElementById('score-message');
+        const retryBtn = document.getElementById('retry-btn');
+
+        // Render questions
+        function renderQuestions() {
+            questionsContainer.innerHTML = '';
+            quizData.forEach((item, qIndex) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'mb-10 p-5 border border-gray-200 rounded-lg hover:shadow-sm transition bg-gray-50';
+                questionDiv.id = `q-block-${qIndex}`;
+                
+                let optionsHtml = '';
+                item.options.forEach((opt, oIndex) => {
+                    optionsHtml += `
+                        <label class="option-label flex items-center p-3 border border-gray-300 rounded-md mb-2 cursor-pointer bg-white" id="label-${qIndex}-${oIndex}">
+                            <input type="radio" name="q${qIndex}" value="${oIndex}" class="mr-3 w-5 h-5 text-blue-600 focus:ring-blue-500">
+                            <span class="text-gray-700">${opt}</span>
+                        </label>
+                    `;
+                });
+
+                questionDiv.innerHTML = `
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">${item.q}</h3>
+                    <div class="options-group space-y-2">
+                        ${optionsHtml}
+                    </div>
+                    <div id="feedback-${qIndex}" class="mt-4 hidden p-4 rounded-md text-sm"></div>
+                `;
+                questionsContainer.appendChild(questionDiv);
+            });
+        }
+
+        function checkAnswers() {
+            const nickname = document.getElementById('nickname').value.trim();
+            if (!nickname) {
+                alert("กรุณากรอกชื่อเล่นหรือนามสมมติก่อนส่งคำตอบครับ/ค่ะ");
+                document.getElementById('nickname').focus();
+                return;
+            }
+
+            let score = 0;
+            let allAnswered = true;
+
+            quizData.forEach((item, qIndex) => {
+                const selected = document.querySelector(`input[name="q${qIndex}"]:checked`);
+                if (!selected) {
+                    allAnswered = false;
+                }
+            });
+
+            if (!allAnswered) {
+                alert("กรุณาตอบคำถามให้ครบทุกข้อก่อนส่งคำตอบครับ/ค่ะ");
+                return;
+            }
+
+            // Disable all inputs
+            document.querySelectorAll('input[type="radio"]').forEach(el => el.disabled = true);
+            document.getElementById('nickname').disabled = true;
+            submitBtn.classList.add('hidden');
+
+            quizData.forEach((item, qIndex) => {
+                const selected = document.querySelector(`input[name="q${qIndex}"]:checked`);
+                const selectedVal = parseInt(selected.value);
+                
+                if (selectedVal === item.ans) {
+                    score++;
+                }
+            });
+
+            // Show results
+            document.getElementById('display-name').textContent = nickname;
+            scoreElement.textContent = score;
+            if(score === 20) {
+                scoreMessageElement.textContent = "ยอดเยี่ยมมาก! คุณมีความรู้เรื่องอาคารต้านทานแผ่นดินไหวในระดับสมบูรณ์แบบ";
+                scoreMessageElement.className = "text-xl mb-8 text-green-600 font-semibold";
+            } else if(score >= 15) {
+                scoreMessageElement.textContent = "ดีมาก! คุณมีความรู้ความเข้าใจในเกณฑ์ดีทีเดียว";
+                scoreMessageElement.className = "text-xl mb-8 text-blue-600 font-semibold";
+            } else if(score >= 10) {
+                scoreMessageElement.textContent = "ผ่านเกณฑ์! คุณมีความรู้พื้นฐาน แต่อาจต้องทบทวนเพิ่มเติมอีกนิด";
+                scoreMessageElement.className = "text-xl mb-8 text-yellow-600 font-semibold";
+            } else {
+                scoreMessageElement.textContent = "ต้องพยายามอีกนิด! ลองทบทวนความรู้และลองทำแบบทดสอบใหม่อีกครั้งนะครับ";
+                scoreMessageElement.className = "text-xl mb-8 text-red-600 font-semibold";
+            }
+            
+            resultContainer.classList.remove('hidden');
+            resultContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetQuiz() {
+            document.getElementById('nickname').value = '';
+            document.getElementById('nickname').disabled = false;
+            renderQuestions();
+            submitBtn.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initialize
+        renderQuestions();
+        submitBtn.addEventListener('click', checkAnswers);
+        retryBtn.addEventListener('click', resetQuiz);
+
+    </script>
+</body>
+</html>
